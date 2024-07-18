@@ -23,7 +23,7 @@ async function typeWriter(text, elementId) {
       if (index < text.length) {
         element.textContent += text.charAt(index);
         index++;
-        setTimeout(writeLetter, 35); // 调整时间来控制打字速度
+        setTimeout(writeLetter, 500); // 调整时间来控制打字速度
       }
     };
     writeLetter();
