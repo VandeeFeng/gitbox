@@ -15,7 +15,7 @@ function cleanText(text) {
   return cleanedText;
 }
 
-function typeWriter(text, elementId, delay = 70) {
+function typeWriter(text, elementId, delay = 140) {
   document.getElementById("aitext").style.display = "none";
   let index = 0;
   const element = document.getElementById(elementId);
