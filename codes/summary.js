@@ -15,7 +15,7 @@ function cleanText(text) {
   return cleanedText;
 }
 
-function typeWriter(text, elementId, delay = 140) {
+function typeWriter(text, elementId, delay = 400) {
   document.getElementById("aitext").style.display = "none";
   let index = 0;
   const element = document.getElementById(elementId);
@@ -23,14 +23,21 @@ function typeWriter(text, elementId, delay = 140) {
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const writeLetter = () => {
-            if (index < text.length) {
-              element.textContent += text.charAt(index);
-              index++;
-              setTimeout(writeLetter, delay); // 使用 setTimeout 控制打字速度
+          let lastTimestamp = performance.now();
+          const writeLetter = (timestamp) => {
+            const elapsed = timestamp - lastTimestamp;
+            if (elapsed >= delay) {
+              if (index < text.length) {
+                element.textContent += text.charAt(index);
+                index++;
+                lastTimestamp = timestamp;
+              }
+              requestAnimationFrame(writeLetter);
+            } else {
+              requestAnimationFrame(writeLetter);
             }
           };
-          writeLetter();
+          writeLetter(performance.now());
           observer.disconnect();
         }
       });
@@ -39,6 +46,7 @@ function typeWriter(text, elementId, delay = 140) {
   );
   observer.observe(element);
 }
+
 
 
 async function ai_gen() {
