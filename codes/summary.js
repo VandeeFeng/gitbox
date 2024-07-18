@@ -15,38 +15,19 @@ function cleanText(text) {
   return cleanedText;
 }
 
-function typeWriter(text, elementId, delay = 400) {
-  document.getElementById("aitext").style.display = "none";
-  let index = 0;
-  const element = document.getElementById(elementId);
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          let lastTimestamp = performance.now();
-          const writeLetter = (timestamp) => {
-            const elapsed = timestamp - lastTimestamp;
-            if (elapsed >= delay) {
-              if (index < text.length) {
-                element.textContent += text.charAt(index);
-                index++;
-                lastTimestamp = timestamp;
-              }
-              requestAnimationFrame(writeLetter);
-            } else {
-              requestAnimationFrame(writeLetter);
-            }
-          };
-          writeLetter(performance.now());
-          observer.disconnect();
-        }
-      });
-    },
-    { rootMargin: "0px", threshold: 0.5 }
-  );
-  observer.observe(element);
-}
-
+async function typeWriter(text, elementId) {
+    document.getElementById("aitext").style.display = "none";
+    let index = 0;
+    const element = document.getElementById(elementId);
+    const writeLetter = () => {
+      if (index < text.length) {
+        element.textContent += text.charAt(index);
+        index++;
+        setTimeout(writeLetter, 35); // 调整时间来控制打字速度
+      }
+    };
+    writeLetter();
+  }
 
 
 async function ai_gen() {
