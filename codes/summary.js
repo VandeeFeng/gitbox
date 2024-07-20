@@ -1,106 +1,105 @@
-  async function sha(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-    const hashHex = hashArray
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join(""); // convert bytes to hex string
-    return hashHex;
-  }
+async function sha(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashHex;
+}
 
-  function cleanText(text) {
-    // 移除 HTML 标签
-    let cleanedText = text.replace(/<[^>]*>?/gm, '');
-    // 移除多余的空格和换行
-    cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
-    return cleanedText;
-  }
+function cleanText(text) {
+  let cleanedText = text.replace(/<[^>]*>?/gm, "");
+  cleanedText = cleanedText.replace(/\s+/g, " ").trim();
+  return cleanedText;
+}
 
-  async function typeWriter(text, elementId) {
+async function typeWriter(text, elementId) {
+  (function() {
     document.getElementById("aitext").style.display = "none";
     let index = 0;
     const element = document.getElementById(elementId);
+    if (!element) {
+      console.error(`Element with id "${elementId}" not found`);
+      return;
+    }
     const writeLetter = () => {
       if (index < text.length) {
         element.textContent += text.charAt(index);
         index++;
-        setTimeout(writeLetter, 35); // 调整时间来控制打字速度
+        requestAnimationFrame(writeLetter);
       }
     };
     writeLetter();
-  }
+  })();
+}
 
-  async function ai_gen() {
-    // 获取页面标题
-    var postTitle = document.title;
-    // 获取页面内容并清理
-    var postContentRaw = document.getElementById('content').innerText;
-    var postContent = cleanText(postContentRaw);
+async function ai_gen() {
+  const postTitle = document.title;
+  const postContentRaw = document.getElementsByClassName("blog-content")[0].innerText;
+  const postContent = cleanText(postContentRaw);
 
-    // 创建包含标题和内容的对象
-    var postData = {
-      title: postTitle,
-      content: postContent
-    };
+  const postData = {
+    title: postTitle,
+    content: postContent,
+  };
 
-    // 将对象转换为JSON字符串
-    var postContentJson = JSON.stringify(postData);
+  const postContentJson = JSON.stringify(postData);
+  const postContentSign = await sha(postContentJson);
 
-    // 创建签名
-    var postContentSign = await sha(postContentJson);
+  const outputContainer = document.getElementById("ai-output");
+  const metaTags = document.getElementsByTagName('meta');
 
-    var outputContainer = document.getElementById("ai-output");
-
-    // 构建请求URL
-    const checkUploadedUrl = `https://summary.vandee.art/is_uploaded?id=${encodeURIComponent(location.href)}&sign=${postContentSign}`;
-    const getSummaryUrl = `https://summary.vandee.art/get_summary?id=${encodeURIComponent(location.href)}&sign=${postContentSign}`;
-
-    // 检查文章是否已上传并获取摘要
-    try {
-      let response = await fetch(checkUploadedUrl);
-      if (!response.ok) {
-        throw new Error(`Check uploaded error: status ${response.status}`);
-      }
-      let uploaded = await response.text();
-      
-      if (uploaded === "yes") {
-        // 如果已上传，获取摘要
-        response = await fetch(getSummaryUrl);
-        if (!response.ok) {
-          throw new Error(`Get summary error: status ${response.status}`);
-        }
-        let summaryText = await response.text();
-        // 使用打字机效果显示摘要
-        typeWriter(summaryText, 'ai-output');
-      } else {
-        // 如果文章未上传，上传文章内容
-        let uploadBlogUrl = new URL("https://summary.vandee.art/upload_blog");
-        uploadBlogUrl.search = new URLSearchParams({ id: encodeURIComponent(location.href) });
-        response = await fetch(uploadBlogUrl, {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: postContentJson
-        });
-        if (!response.ok) {
-          throw new Error(`Upload blog error: status ${response.status}`);
-        }
-        // 等待上传完成再获取摘要
-        await new Promise(r => setTimeout(r, 1000)); // 等待1秒，这里可以根据实际情况调整等待时间
-        response = await fetch(getSummaryUrl);
-        if (!response.ok) {
-          throw new Error(`Get summary after upload error: status ${response.status}`);
-        }
-        summaryText = await response.text();
-        typeWriter(summaryText, 'ai-output');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      outputContainer.textContent = 'Error: ' + error.message;
+  let ogUrl = null;
+  // 遍历 meta 标签,找到 property 属性为 "og:url" 的标签
+  for (let i = 0; i < metaTags.length; i++) {
+    if (metaTags[i].getAttribute('property') === 'og:url') {
+      // 获取该标签的 content 属性值并赋给变量 ogUrl
+      ogUrl = metaTags[i].getAttribute('content');
+      break;
     }
   }
 
-  // 确保DOM加载完成后执行ai_gen函数
-  document.addEventListener('DOMContentLoaded', ai_gen);
+  if (ogUrl) {
+    const checkUploadedUrl = `https://summary.vandee.art/is_uploaded?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
+    const getSummaryUrl = `https://summary.vandee.art/get_summary?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
+    const uploadBlogUrl = new URL("https://summary.vandee.art/upload_blog");
+    uploadBlogUrl.search = new URLSearchParams({ id: encodeURIComponent(location.href) });
+
+    try {
+      const uploadedResponse = await fetch(checkUploadedUrl);
+      if (!uploadedResponse.ok) {
+        throw new Error(`Check uploaded error: status ${uploadedResponse.status}`);
+      }
+      const uploaded = await uploadedResponse.text();
+
+      if (uploaded === "yes") {
+        const summaryResponse = await fetch(getSummaryUrl);
+        const summaryText = await summaryResponse.text();
+        typeWriter(summaryText, "ai-output");
+      } else {
+        const uploadResponse = await fetch(uploadBlogUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: postContentJson,
+        });
+        if (!uploadResponse.ok) {
+          throw new Error(`Upload blog error: status ${uploadResponse.status}`);
+        }
+        const summaryResponse = await fetch(getSummaryUrl);
+        const summaryText = await summaryResponse.text();
+        typeWriter(summaryText, "ai-output");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      outputContainer.textContent = "Error: " + error.message;
+    }
+  } else {
+    console.log('No og:url found on the page.');
+  }
+}
+
+document.addEventListener("DOMContentLoaded", ai_gen);
