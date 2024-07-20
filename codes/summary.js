@@ -23,7 +23,7 @@ function cleanText(text) {
       if (index < text.length) {
         element.textContent += text.charAt(index);
         index++;
-        setTimeout(writeLetter, 50); // 调整时间来控制打字速度
+        setTimeout(writeLetter, 100); // 调整时间来控制打字速度
       }
     };
     writeLetter();
