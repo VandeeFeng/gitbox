@@ -25,7 +25,7 @@
       if (index < text.length) {
         element.textContent += text.charAt(index);
         index++;
-        setTimeout(writeLetter, 30); // 调整时间来控制打字速度
+        setTimeout(writeLetter, 35); // 调整时间来控制打字速度
       }
     };
     writeLetter();
@@ -53,8 +53,8 @@
     var outputContainer = document.getElementById("ai-output");
 
     // 构建请求URL
-    const checkUploadedUrl = `https://your.workers.dev/is_uploaded?id=${encodeURIComponent(location.href)}&sign=${postContentSign}`;
-    const getSummaryUrl = `https://your.workers.dev/get_summary?id=${encodeURIComponent(location.href)}&sign=${postContentSign}`;
+    const checkUploadedUrl = `https://summary.vandee.art/is_uploaded?id=${encodeURIComponent(location.href)}&sign=${postContentSign}`;
+    const getSummaryUrl = `https://summary.vandee.art/get_summary?id=${encodeURIComponent(location.href)}&sign=${postContentSign}`;
 
     // 检查文章是否已上传并获取摘要
     try {
@@ -75,7 +75,7 @@
         typeWriter(summaryText, 'ai-output');
       } else {
         // 如果文章未上传，上传文章内容
-        let uploadBlogUrl = new URL("https://your.workers.dev/upload_blog");
+        let uploadBlogUrl = new URL("https://summary.vandee.art/upload_blog");
         uploadBlogUrl.search = new URLSearchParams({ id: encodeURIComponent(location.href) });
         response = await fetch(uploadBlogUrl, {
           method: 'POST',
@@ -88,7 +88,7 @@
           throw new Error(`Upload blog error: status ${response.status}`);
         }
         // 等待上传完成再获取摘要
-        await new Promise(r => setTimeout(r, 500)); // 等待1秒，这里可以根据实际情况调整等待时间
+        await new Promise(r => setTimeout(r, 1000)); // 等待1秒，这里可以根据实际情况调整等待时间
         response = await fetch(getSummaryUrl);
         if (!response.ok) {
           throw new Error(`Get summary after upload error: status ${response.status}`);
