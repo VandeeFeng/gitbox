@@ -100,7 +100,8 @@ fe: {
   description: 'Display my featured posts',
   handler: () => {
     const links = [
-      { href: 'https://www.vandee.art/posts/2024-05-22-org-pkm-manual/', text: 'PKM（个人知识管理）构建手册' },
+      { href: 'https://www.vandee.art/posts/2024-05-22-org-pkm-manual/', text: 'PKM（个人知识管理）构建手册 - Emacs' },
+      { href: 'https://www.vandee.art/posts/2024-08-02-nvim-pkm-manual/', text: 'PKM（个人知识管理）构建手册 - Nvim' },
       { href: 'https://www.vandee.art/posts/2023-12-06-learn-all-the-time/', text: 'Learn All The Time' },
       { href: 'https://www.vandee.art/posts/2024-05-05-the-value-of-art/', text: '也说说艺术的价值' },
       { href: 'https://www.vandee.art/posts/2024-03-03-a-monkey-shaking-the-branch/', text: '摇树枝的猴子' },
