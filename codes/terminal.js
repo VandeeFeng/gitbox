@@ -71,6 +71,7 @@ const commandHandlers = {
     handler: () => {
       const links = [
         { href: 'https://www.vandee.art/blog', text: 'Blog' },
+        { href: 'https://wiki.vandee.art', text: 'Vandee Wiki' },
         { href: 'https://dg.vandee.art', text: 'Digital Garden' },
       ];
       const linkElements = links.map(link => {
