@@ -62,9 +62,9 @@ async function ai_gen() {
   }
 
   if (ogUrl) {
-    const checkUploadedUrl = `https://summary.vandee.art/is_uploaded?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
-    const getSummaryUrl = `https://summary.vandee.art/get_summary?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
-    const uploadBlogUrl = new URL("https://summary.vandee.art/upload_blog");
+    const checkUploadedUrl = `https://summary.vandee.workers.dev/is_uploaded?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
+    const getSummaryUrl = `https://summary.vandee.workers.dev/get_summary?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
+    const uploadBlogUrl = new URL("https://summary.vandee.workers.dev/upload_blog");
     uploadBlogUrl.search = new URLSearchParams({ id: encodeURIComponent(location.href) });
 
     try {
