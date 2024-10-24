@@ -37,7 +37,7 @@ async function typeWriter(text, elementId) {
 
 async function ai_gen() {
   const postTitle = document.title;
-  const postContentRaw = document.getElementsByClassName("content")[0].innerText;
+  const postContentRaw = document.getElementsByID("content")[0].innerText;
   const postContent = cleanText(postContentRaw);
 
   const postData = {
