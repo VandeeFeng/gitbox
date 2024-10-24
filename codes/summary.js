@@ -3,9 +3,7 @@ async function sha(str) {
   const data = encoder.encode(str);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   return hashHex;
 }
 
@@ -16,28 +14,26 @@ function cleanText(text) {
 }
 
 async function typeWriter(text, elementId) {
-  (function() {
-    document.getElementById("aitext").style.display = "none";
-    let index = 0;
-    const element = document.getElementById(elementId);
-    if (!element) {
-      console.error(`Element with id "${elementId}" not found`);
-      return;
+  document.getElementById("aitext").style.display = "none";
+  let index = 0;
+  const element = document.getElementById(elementId);
+  if (!element) {
+    console.error(`Element with id "${elementId}" not found`);
+    return;
+  }
+  const writeLetter = () => {
+    if (index < text.length) {
+      element.textContent += text.charAt(index);
+      index++;
+      requestAnimationFrame(writeLetter);
     }
-    const writeLetter = () => {
-      if (index < text.length) {
-        element.textContent += text.charAt(index);
-        index++;
-        requestAnimationFrame(writeLetter);
-      }
-    };
-    writeLetter();
-  })();
+  };
+  writeLetter();
 }
 
 async function ai_gen() {
   const postTitle = document.title;
-  const postContentRaw = document.getElementsById("content")[0].innerText;
+  const postContentRaw = document.getElementById("content").innerText; // Fixed this line
   const postContent = cleanText(postContentRaw);
 
   const postData = {
@@ -49,23 +45,27 @@ async function ai_gen() {
   const postContentSign = await sha(postContentJson);
 
   const outputContainer = document.getElementById("ai-output");
-  const metaTags = document.getElementsByTagName('meta');
+  const metaTags = document.getElementsByTagName("meta");
 
   let ogUrl = null;
-  // 遍历 meta 标签,找到 property 属性为 "og:url" 的标签
   for (let i = 0; i < metaTags.length; i++) {
-    if (metaTags[i].getAttribute('property') === 'og:url') {
-      // 获取该标签的 content 属性值并赋给变量 ogUrl
-      ogUrl = metaTags[i].getAttribute('content');
+    if (metaTags[i].getAttribute("property") === "og:url") {
+      ogUrl = metaTags[i].getAttribute("content");
       break;
     }
   }
 
   if (ogUrl) {
-    const checkUploadedUrl = `https://summary.vandee.art/is_uploaded?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
-    const getSummaryUrl = `https://summary.vandee.art/get_summary?id=${encodeURIComponent(ogUrl)}&sign=${postContentSign}`;
+    const checkUploadedUrl = `https://summary.vandee.art/is_uploaded?id=${encodeURIComponent(
+      ogUrl
+    )}&sign=${postContentSign}`;
+    const getSummaryUrl = `https://summary.vandee.art/get_summary?id=${encodeURIComponent(
+      ogUrl
+    )}&sign=${postContentSign}`;
     const uploadBlogUrl = new URL("https://summary.vandee.art/upload_blog");
-    uploadBlogUrl.search = new URLSearchParams({ id: encodeURIComponent(location.href) });
+    uploadBlogUrl.search = new URLSearchParams({
+      id: encodeURIComponent(location.href),
+    });
 
     try {
       const uploadedResponse = await fetch(checkUploadedUrl);
@@ -98,7 +98,7 @@ async function ai_gen() {
       outputContainer.textContent = "Error: " + error.message;
     }
   } else {
-    console.log('No og:url found on the page.');
+    console.log("No og:url found on the page.");
   }
 }
 
