@@ -32,8 +32,13 @@ async function typeWriter(text, elementId) {
 }
 
 async function ai_gen() {
+  const outputContainer = document.getElementById("ai-output");
+  if (!outputContainer) {
+    throw new Error('Element with id "ai-output" not found');
+  }
+
   const postTitle = document.title;
-  const postContentRaw = document.getElementById("content").innerText; // Fixed this line
+  const postContentRaw = document.getElementById("content").innerText;
   const postContent = cleanText(postContentRaw);
 
   const postData = {
@@ -44,7 +49,6 @@ async function ai_gen() {
   const postContentJson = JSON.stringify(postData);
   const postContentSign = await sha(postContentJson);
 
-  const outputContainer = document.getElementById("ai-output");
   const metaTags = document.getElementsByTagName("meta");
 
   let ogUrl = null;
