@@ -46,4 +46,4 @@
   };
 
   // 调用两个函数
-  fetchRecentArticles('https://www.vandee.art/index.xml', 'rssFeed');
+  fetchRecentArticles('https://www.vandee.art/rss.xml', 'rssFeed');
