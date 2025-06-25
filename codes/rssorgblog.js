@@ -1,4 +1,4 @@
-  fetch('https://www.vandee.art/rss.xml')
+  fetch('https://www.vandee.art/blog/rss.xml')
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
